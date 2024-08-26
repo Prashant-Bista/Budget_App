@@ -1,4 +1,5 @@
 import 'package:budget_app/firebase_options.dart';
+import 'package:budget_app/responsive_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      Home:
+      home:ResponsiveHandler(),
     );
   }
 }
