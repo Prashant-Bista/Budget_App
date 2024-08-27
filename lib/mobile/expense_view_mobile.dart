@@ -6,7 +6,9 @@ class ExpenseViewMobile extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context,WidgetRef ref) {
-    return SafeArea(child: Scaffold());
+    return SafeArea(child: Scaffold(
+      appBar: AppBar(),
+    ));
   }
 }
 

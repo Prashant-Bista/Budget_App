@@ -1,9 +1,12 @@
 import 'package:budget_app/components.dart';
 import 'package:budget_app/view_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:sign_button/constants.dart';
+import 'package:sign_button/create_button.dart';
 
 class LoginViewMobile extends HookConsumerWidget {
   const LoginViewMobile({super.key});
@@ -88,32 +91,73 @@ class LoginViewMobile extends HookConsumerWidget {
                 obscureText: viewModelProvider.isObscured,
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                //register button
                 SizedBox(
                   height: 50.0,
                   width: 150.0,
-
                   child: MaterialButton(
-                    color: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0)
-                    ),
-                    splashColor: Colors.grey,
+                      color: Colors.black,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      splashColor: Colors.grey,
                       child: OpenSans(
                         text: "Register",
                         size: 25.0,
                         color: Colors.white,
                       ),
-                      onPressed: () async{
-                      await viewModelProvider.createUserWithEmailAndPassword(context, _email.text, _password.text);
-                      }),
+                      onPressed: () async {
+                        await viewModelProvider.createUserWithEmailAndPassword(
+                            context, _email.text, _password.text);
 
-                )
+                      }),
+                ),
+                SizedBox(
+                  width: 20.0,
+                ),
+                Text(
+                  "Or",
+                  style:
+                      GoogleFonts.pacifico(color: Colors.black, fontSize: 15.0),
+                ),
+                SizedBox(width: 20.0,),
+                SizedBox(
+                  height: 50,
+                  width: 150,
+                  child: MaterialButton(
+                    
+                      child: OpenSans(text: "Login", size: 25.0,color: Colors.white,),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      color: Colors.black,
+                      onPressed: (){
+                        viewModelProvider.signInWithEmailAndPassword(context, _email.text, _password.text);
+                      },
+                    padding: EdgeInsets.all(10),
+                  ),
+                ),
+
               ],
-            )
+            ),
+            SizedBox(height: 30.0,),
+
+            SignInButton(
+              buttonType: ButtonType.google,
+              btnColor: Colors.black,
+              btnTextColor: Colors.white,
+              buttonSize: ButtonSize.medium,
+              onPressed: ()async{
+                if (kIsWeb){
+
+                }
+              },
+            ),
           ],
         ),
       ),

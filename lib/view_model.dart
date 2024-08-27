@@ -1,8 +1,10 @@
+
 import 'package:budget_app/components.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 final viewModel = ChangeNotifierProvider.autoDispose<ViewModel>((ref)=>ViewModel());
@@ -34,6 +36,34 @@ void toggleObscured(){
       logger.d("Registration error $error");
       DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), ''));
     });
+  }
+  Future<void> signInWithEmailAndPassword(BuildContext context, String email,String password) async{
+  await _auth.signInWithEmailAndPassword(email: email, password: password).then((value)=>logger.d("Login Successful")).onError((error,stackTrace){
+    DialogBox(context, error.toString().replaceAll(RegExp("\\[.*?\\]"), ''));
+  });
+  }
+  Future<void> signInwithGoogleWeb(BuildContext context) async{
+  GoogleAuthProvider googleAuthProvider= GoogleAuthProvider();
+  await _auth.signInWithPopup(googleAuthProvider).onError((error,stackTrace)=>
+    DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), ""))
+  );
+  logger.d("Current user is not empty = ${_auth.currentUser!.uid.isNotEmpty}");
+  }
+  Future<void> signInwithGoogleMobile(BuildContext context) async{
+  final GoogleSignInAccount? googleuser = await GoogleSignIn().signIn().onError((error,stackTrae)=>DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), "")));
+  final GoogleSignInAuthentication? googleAuth = await googleuser?.authentication;
+final credential= GoogleAuthProvider.credential(
+  accessToken: googleAuth?.accessToken,
+  idToken: googleAuth?.idToken
+);
+await _auth.signInWithCredential(credential).then((value){
+  logger.d("Google Sign in successful");
+}).onError((error,stackTrace){
+  logger.d("Google Sign in error $error");
+  DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), ""));
+});
+
+    logger.d("Current user is not empty = ${_auth.currentUser!.uid.isNotEmpty}");
   }
 }
 
