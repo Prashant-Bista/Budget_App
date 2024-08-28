@@ -30,18 +30,21 @@ void toggleObscured(){
   isObscured= !(isObscured);
   notifyListeners();
 }
+
+//createUserWithEmailAndPassword
   Future<void> createUserWithEmailAndPassword(BuildContext context,String email, String password) async{
-  
     await _auth.createUserWithEmailAndPassword(email: email, password: password).then((value)=> logger.d("Registration Successful")).onError((error,stackTrace){
       logger.d("Registration error $error");
       DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), ''));
     });
   }
+  //signInWithEmailAndPassword
   Future<void> signInWithEmailAndPassword(BuildContext context, String email,String password) async{
   await _auth.signInWithEmailAndPassword(email: email, password: password).then((value)=>logger.d("Login Successful")).onError((error,stackTrace){
     DialogBox(context, error.toString().replaceAll(RegExp("\\[.*?\\]"), ''));
   });
   }
+  //signInwithGoogleWeb
   Future<void> signInwithGoogleWeb(BuildContext context) async{
   GoogleAuthProvider googleAuthProvider= GoogleAuthProvider();
   await _auth.signInWithPopup(googleAuthProvider).onError((error,stackTrace)=>
@@ -49,8 +52,11 @@ void toggleObscured(){
   );
   logger.d("Current user is not empty = ${_auth.currentUser!.uid.isNotEmpty}");
   }
+
+  //signInwithGoogleMobile
   Future<void> signInwithGoogleMobile(BuildContext context) async{
   final GoogleSignInAccount? googleuser = await GoogleSignIn().signIn().onError((error,stackTrae)=>DialogBox(context, error.toString().replaceAll(RegExp('\\[.*?\\]'), "")));
+
   final GoogleSignInAuthentication? googleAuth = await googleuser?.authentication;
 final credential= GoogleAuthProvider.credential(
   accessToken: googleAuth?.accessToken,

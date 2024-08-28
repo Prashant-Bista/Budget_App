@@ -154,7 +154,10 @@ class LoginViewMobile extends HookConsumerWidget {
               buttonSize: ButtonSize.medium,
               onPressed: ()async{
                 if (kIsWeb){
-
+                  await viewModelProvider.signInwithGoogleWeb(context);
+                }
+                else{
+                  await viewModelProvider.signInwithGoogleMobile(context);
                 }
               },
             ),
