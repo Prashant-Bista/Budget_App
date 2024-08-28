@@ -14,6 +14,13 @@ class ViewModel extends ChangeNotifier{
   final _auth=FirebaseAuth.instance;
   bool isSignedIn=false;
   var logger = Logger();
+
+  List expensesName=[];
+  List expensesAmount=[];
+  List incomesName=[];
+  List incomesAmount=[];
+
+
   //check if signed in
 Future<void> isLoggedin() async{
   await _auth.authStateChanges().listen((User? user){
@@ -30,7 +37,7 @@ void toggleObscured(){
   isObscured= !(isObscured);
   notifyListeners();
 }
-
+//Authentication
 //createUserWithEmailAndPassword
   Future<void> createUserWithEmailAndPassword(BuildContext context,String email, String password) async{
     await _auth.createUserWithEmailAndPassword(email: email, password: password).then((value)=> logger.d("Registration Successful")).onError((error,stackTrace){
@@ -71,6 +78,10 @@ await _auth.signInWithCredential(credential).then((value){
 
     logger.d("Current user is not empty = ${_auth.currentUser!.uid.isNotEmpty}");
   }
+
+  //
+Future<void> logout()async{
+  await _auth.signOut();
+}
 }
 
-//Authentication
