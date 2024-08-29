@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:budget_app/components.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -85,7 +87,57 @@ await _auth.signInWithCredential(credential).then((value){
 Future<void> logout()async{
   await _auth.signOut();
 }
-Future addExpense(BuildContext context) async{
+  Future addExpense(BuildContext context) async{
+    final formKey = GlobalKey<FormState>();
+    TextEditingController controllerName = TextEditingController();
+    TextEditingController controllerAmount= TextEditingController();
+    showDialog(context: context, builder: (BuildContext context)=>AlertDialog(
+      actionsAlignment: MainAxisAlignment.center,
+      contentPadding: EdgeInsets.all(32.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      title: Form(key: formKey,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextForm(text: "Name", containerWidth: 130.0, controller: controllerName, validator:(text){
+              if(text.toString().isEmpty){
+                return "Required";
+              }
+            }, hintText: "Name"),
+            SizedBox(width: 10.0,),
+            TextForm(digitsOnly:true,text: "Amont", containerWidth: 100.0, controller: controllerAmount, validator: (text){
+              if (text.toString().isEmpty){
+                return "Required";
+              }
+            }, hintText: "Amount"),
+          ],
+        ),),
+      actions: [
+        MaterialButton(onPressed: () async{
+          if (formKey.currentState!.validate()){
+            await userCollection.doc(_auth.currentUser!.uid).collection('expenses').add({
+              "name":controllerName.text,
+              "amount":controllerAmount.text,
+            }).onError((error,stackTrace){logger.d(" add expense error = $error");
+            return DialogBox(context, error.toString());
+            });
+            Navigator.pop(context);
+          }}
+          ,child: OpenSans(text: "Save", size: 15.0,color: Colors.white,),
+          splashColor: Colors.grey,
+          color: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+
+        )
+      ],
+    ));
+  }
+
+Future addIncome(BuildContext context) async{
   final formKey = GlobalKey<FormState>();
   TextEditingController controllerName = TextEditingController();
   TextEditingController controllerAmount= TextEditingController();
@@ -105,7 +157,7 @@ Future addExpense(BuildContext context) async{
           }
         }, hintText: "Name"),
         SizedBox(width: 10.0,),
-        TextForm(digitsOnly:true,text: "Amont", containerWidth: 100.0, controller: controllerAmount, validator: (text){
+        TextForm(digitsOnly:true,text: "Amount", containerWidth: 100.0, controller: controllerAmount, validator: (text){
           if (text.toString().isEmpty){
             return "Required";
           }
@@ -115,15 +167,17 @@ Future addExpense(BuildContext context) async{
     actions: [
       MaterialButton(onPressed: () async{
         if (formKey.currentState!.validate()){
-         await userCollection.doc(_auth.currentUser!.uid).collection('expenses').add({
+          await userCollection.doc(_auth.currentUser!.uid).collection("incomes").add({
             "name":controllerName.text,
             "amount":controllerAmount.text,
-          }).onError((error,stackTrace){logger.d(" add expense error = $error");
-          return DialogBox(context, error.toString());
+          }).onError((error,stackTrace){
+            logger.d("add Income error =$error");
+            return DialogBox(context, error.toString());
           });
-          Navigator.pop(context);
-        }}
-      ,child: OpenSans(text: "Save", size: 15.0,color: Colors.white,),
+        }
+        Navigator.pop(context);
+        },
+        child: OpenSans(text: "Save", size: 15.0,color: Colors.white,),
       splashColor: Colors.grey,
         color: Colors.black,
         shape: RoundedRectangleBorder(
@@ -133,6 +187,41 @@ Future addExpense(BuildContext context) async{
       )
     ],
   ));
+}
+void expensesStream() async{
+    await for (var snapshot in userCollection.doc(_auth.currentUser!.uid).collection("expenses").snapshots()){
+      expensesAmount= [];
+      expensesName=[];
+      for (var expense in snapshot.docs){
+        expensesName.add(expense.data()['name']);
+        expensesAmount.add(expense.data()['amount']);
+        notifyListeners();
+      }
+    }
+}
+void incomesStream() async {
+  await for (var snapshot in userCollection.doc(_auth.currentUser!.uid).collection("incomes").snapshots()){
+    incomesAmount=[];
+    incomesName=[];
+    for (var income in snapshot.docs){
+      incomesAmount.add(income.data()["amount"]);
+      incomesName.add(income.data()["name"]);
+      notifyListeners();
+    }
+  };
+}
+
+Future<void> reset() async{
+  await userCollection.doc(_auth.currentUser!.uid).collection("expenses").get().then((snapshot){
+    for (DocumentSnapshot ds in snapshot.docs){
+      ds.reference.delete();
+    }
+  });
+  await userCollection.doc(_auth.currentUser!.uid).collection("incomes").get().then((snapshot){
+    for (DocumentSnapshot ds in snapshot.docs){
+      ds.reference.delete();
+    }
+  });
 }
 }
 
