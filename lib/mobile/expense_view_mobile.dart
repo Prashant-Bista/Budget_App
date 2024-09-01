@@ -22,93 +22,13 @@ class ExpenseViewMobile extends HookConsumerWidget {
     }
     int totalExpense = 0;
     int totalIncome = 0;
-    void calculate() {
-      for (int i = 0; i < viewModelProvider.expensesAmount.length; i++) {
-        totalExpense =
-            totalExpense + int.parse(viewModelProvider.expensesAmount[i]);
-      }
-      for (int i = 0; i < viewModelProvider.incomesAmount.length; i++) {
-        totalIncome =
-            totalIncome + int.parse(viewModelProvider.incomesAmount[i]);
-      }
-    }
-
-    calculate();
+    List<int> values= calculate(viewModelProvider,totalExpense,totalIncome);
+    totalExpense=values[0];
+    totalIncome=values[1];
     int budgetLeft = totalIncome - totalExpense;
     return SafeArea(
         child: Scaffold(
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            DrawerHeader(
-                padding: EdgeInsets.only(bottom: 20.0),
-                child: Container(
-                  child: CircleAvatar(
-                    radius: 180.0,
-                    backgroundColor: Colors.white,
-                    child: Image(
-                      height: 100,
-                      image: AssetImage("assets/logo.png"),
-                      filterQuality: FilterQuality.high,
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(width: 1.0, color: Colors.black),
-                  ),
-                )),
-            SizedBox(
-              height: 10.0,
-            ),
-            MaterialButton(
-                elevation: 15.0,
-                height: 50.0,
-                minWidth: 150.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                color: Colors.black,
-                child: OpenSans(
-                  text: "Logout",
-                  size: 20.0,
-                  color: Colors.white,
-                ),
-                onPressed: () async {
-                  await viewModelProvider.logout();
-                }),
-            SizedBox(
-              height: 20.0,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                IconButton(
-                    onPressed: () async {
-                      await launchUrl(Uri.parse(
-                          "https://www.linkedin.com/in/prashant-bista-9016b5270/"));
-                    },
-                    icon: Image.asset(
-                      "assets/linkedin.png",
-                      height: 35,
-                      width: 35,
-                    )),
-                IconButton(
-                    onPressed: () async {
-                      await launchUrl(
-                          Uri.parse("https://github.com/Prashant-Bista"));
-                    },
-                    icon: Image.asset(
-                      "assets/github.png",
-                      height: 35,
-                      width: 35,
-                    ))
-              ],
-            )
-          ],
-        ),
-      ),
+      drawer: DrawerExpense(viewModelProvider: viewModelProvider,),
       appBar: AppBar(
         actions: [
           IconButton(
@@ -210,67 +130,13 @@ class ExpenseViewMobile extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               //add expense
-              SizedBox(
-                height: 40.0,
-                width: 155.0,
-                child: MaterialButton(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 15.0,
-                      ),
-                      OpenSans(
-                        text: "Add Expense",
-                        size: 14.0,
-                        color: Colors.white,
-                      )
-                    ],
-                  ),
-                  splashColor: Colors.grey,
-                  color: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  onPressed: () async {
-                    await viewModelProvider.addExpense(context);
-                  },
-                ),
-              ),
+              AddingButtons(provider: viewModelProvider, name: "Add Expense", isweb: false),
               SizedBox(
                 width: 10.0,
               ),
-              SizedBox(
-                height: 40.0,
-                width: 155.0,
-                child: MaterialButton(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        Icons.add,
-                        color: Colors.white,
-                        size: 15.0,
-                      ),
-                      OpenSans(
-                        text: "Add income",
-                        size: 14.0,
-                        color: Colors.white,
-                      )
-                    ],
-                  ),
-                  splashColor: Colors.grey,
-                  color: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  onPressed: () async {
-                    await viewModelProvider.addIncome(context);
-                  },
-                ),
-              ),
+          AddingButtons(provider: viewModelProvider, name: "Add Income", isweb: false),
+
+
             ],
           ),
           SizedBox(
@@ -290,6 +156,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       height: 210.0,
                       width: 180.0,
                       decoration: BoxDecoration(
+                        color: Colors.redAccent,
                         borderRadius: BorderRadius.all(
                           Radius.circular(15.0),
                         ),
@@ -303,13 +170,13 @@ class ExpenseViewMobile extends HookConsumerWidget {
                               children: [
                                 Poppins(
                                     text: viewModelProvider.expensesName[index],
-                                    size: 12.0),
+                                    size: 14.0),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: Poppins(
                                       text: viewModelProvider
                                           .expensesAmount[index],
-                                      size: 12.0),
+                                      size: 14.0),
                                 )
                               ],
                             );
@@ -325,6 +192,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       height: 210.0,
                       width: 180.0,
                       decoration: BoxDecoration(
+                        color: Colors.lightGreen,
                         border: Border.all(width: 1.0, color: Colors.black),
                         borderRadius: BorderRadius.all(Radius.circular(15.0))
                       ),
@@ -334,13 +202,13 @@ class ExpenseViewMobile extends HookConsumerWidget {
                           children: [
                             Poppins(
                                 text: viewModelProvider.incomesName[index],
-                                size: 12.0),
+                                size: 14.0),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Poppins(
                                   text: viewModelProvider
                                       .incomesAmount[index],
-                                  size: 12.0),
+                                  size: 14.0),
                             )
                           ],
                         );

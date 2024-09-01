@@ -12,11 +12,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 final viewModel = ChangeNotifierProvider.autoDispose<ViewModel>((ref)=>ViewModel());
 CollectionReference userCollection= FirebaseFirestore.instance.collection("users");
-
+final authStateProvider =StreamProvider<User?>((ref){
+  return ref.read(viewModel).authStateChange;
+});
 class ViewModel extends ChangeNotifier{
   bool isObscured=true;
   final _auth=FirebaseAuth.instance;
-  bool isSignedIn=false;
+  // bool isSignedIn=false;
   var logger = Logger();
 
   List expensesName=[];
@@ -24,19 +26,19 @@ class ViewModel extends ChangeNotifier{
   List incomesName=[];
   List incomesAmount=[];
 
-
+Stream<User?>get authStateChange => _auth.authStateChanges();
   //check if signed in
-Future<void> isLoggedin() async{
-  await _auth.authStateChanges().listen((User? user){
-    if(user==null){
-      isSignedIn=false;
-    }
-    else{
-      isSignedIn=true;
-    }
-  });
-  notifyListeners();
-}
+// Future<void> isLoggedin() async{
+//   await _auth.authStateChanges().listen((User? user){
+//     if(user==null){
+//       isSignedIn=false;
+//     }
+//     else{
+//       isSignedIn=true;
+//     }
+//   });
+//   notifyListeners();
+// }
 void toggleObscured(){
   isObscured= !(isObscured);
   notifyListeners();
@@ -107,7 +109,7 @@ Future<void> logout()async{
               }
             }, hintText: "Name"),
             SizedBox(width: 10.0,),
-            TextForm(digitsOnly:true,text: "Amont", containerWidth: 100.0, controller: controllerAmount, validator: (text){
+            TextForm(digitsOnly:true,text: "Amount", containerWidth: 100.0, controller: controllerAmount, validator: (text){
               if (text.toString().isEmpty){
                 return "Required";
               }
@@ -224,4 +226,16 @@ Future<void> reset() async{
   });
 }
 }
+List<int> calculate(final provider, int totalExpense, int totalIncome) {
+  for (int i = 0; i < provider.expensesAmount.length; i++) {
+    totalExpense =
+        totalExpense + int.parse(provider.expensesAmount[i]);
+  }
+  for (int i = 0; i < provider.incomesAmount.length; i++) {
+    totalIncome =
+        totalIncome + int.parse(provider.incomesAmount[i]);
+  }
+  return [totalExpense,totalIncome];
+}
+
 

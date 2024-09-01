@@ -11,27 +11,60 @@ class ResponsiveHandler extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context,WidgetRef ref) {
- final viewModelProvider =ref.watch(viewModel);
+ print("Rebuid checker");
  //to update the issignedin value
- viewModelProvider.isLoggedin();
-if(viewModelProvider.isSignedIn){
-  return LayoutBuilder(builder: (context,constrains){
-    if (constrains.maxWidth>800){
-      return ExpenseViewWeb();
-    }
-    else
-      return ExpenseViewMobile();
+ final _authState = ref.watch(authStateProvider);
+ return _authState.when(data: (data){
+   if (data!=null){
+     return LayoutBuilder(builder: (context,constrains){
+       if (constrains.maxWidth>800){
+         return ExpenseViewWeb();
+       }
+       else
+         return ExpenseViewMobile();
 
-  });
-}
-else{
-  return LayoutBuilder(builder: (context,constraints){
-    if(constraints.maxWidth>800){
-      return LoginViewWeb();
-    }
-    else
-      return LoginViewMobile();
-  });
-}
+     });
+   }
+   else{
+     return LayoutBuilder(builder: (context,constraints){
+       if(constraints.maxWidth>800){
+         return LoginViewWeb();
+       }
+       else
+         return LoginViewMobile();
+     });
+   }
+ }, error: (e,stackTrace){ return LayoutBuilder(builder: (context,constraints){
+   if(constraints.maxWidth>800){
+     return LoginViewWeb();
+   }
+   else
+     return LoginViewMobile();
+ });}, loading: (){return LayoutBuilder(builder: (context,constraints){
+   if(constraints.maxWidth>800){
+     return LoginViewWeb();
+   }
+   else
+     return LoginViewMobile();
+ });});
+// if(viewModelProvider.isSignedIn){
+//   return LayoutBuilder(builder: (context,constrains){
+//     if (constrains.maxWidth>800){
+//       return ExpenseViewWeb();
+//     }
+//     else
+//       return ExpenseViewMobile();
+//
+//   });
+// }
+// else{
+//   return LayoutBuilder(builder: (context,constraints){
+//     if(constraints.maxWidth>800){
+//       return LoginViewWeb();
+//     }
+//     else
+//       return LoginViewMobile();
+//   });
+// }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:budget_app/components.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,93 +23,15 @@ class ExpenseViewWeb extends HookConsumerWidget {
     }
     int totalExpense = 0;
     int totalIncome = 0;
-    void calculate() {
-      for (int i = 0; i < viewModelProvider.expensesAmount.length; i++) {
-        totalExpense =
-            totalExpense + int.parse(viewModelProvider.expensesAmount[i]);
-      }
-      for (int i = 0; i < viewModelProvider.incomesAmount.length; i++) {
-        totalIncome =
-            totalIncome + int.parse(viewModelProvider.incomesAmount[i]);
-      }
-    }
 
-    calculate();
+
+   List<int> values= calculate(viewModelProvider,totalExpense,totalIncome);
+   totalExpense=values[0];
+   totalIncome=values[1];
     int budgetLeft = totalIncome - totalExpense;
     return SafeArea(
         child: Scaffold(
-          drawer: Drawer(
-            backgroundColor: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                DrawerHeader(
-                    padding: EdgeInsets.only(bottom: 20.0),
-                    child: Container(
-                      child: CircleAvatar(
-                        radius: 180.0,
-                        backgroundColor: Colors.white,
-                        child: Image(
-                          height: 100,
-                          image: AssetImage("assets/logo.png"),
-                          filterQuality: FilterQuality.high,
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 1.0, color: Colors.black),
-                      ),
-                    )),
-                SizedBox(
-                  height: 10.0,
-                ),
-                MaterialButton(
-                    elevation: 15.0,
-                    height: 50.0,
-                    minWidth: 150.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    color: Colors.black,
-                    child: OpenSans(
-                      text: "Logout",
-                      size: 30.0,
-                      color: Colors.white,
-                    ),
-                    onPressed: () async {
-                      await viewModelProvider.logout();
-                    }),
-                SizedBox(
-                  height: 30.0,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconButton(
-                        onPressed: () async {
-                          await launchUrl(Uri.parse(
-                              "https://www.linkedin.com/in/prashant-bista-9016b5270/"));
-                        },
-                        icon: Image.asset(
-                          "assets/linkedin.png",
-                          height: 40,
-                          width: 40,
-                        )),
-                    IconButton(
-                        onPressed: () async {
-                          await launchUrl(
-                              Uri.parse("https://github.com/Prashant-Bista"));
-                        },
-                        icon: Image.asset(
-                          "assets/github.png",
-                          height: 40,
-                          width: 40,
-                        ))
-                  ],
-                )
-              ],
-            ),
-          ),
+          drawer: DrawerExpense(viewModelProvider: viewModelProvider,),
           appBar: AppBar(
             actions: [
               IconButton(
@@ -143,68 +66,12 @@ class ExpenseViewWeb extends HookConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        height: 45.0,
-                        width: 160.0,
-                        child: MaterialButton(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 17.0,
-                              ),
-                              OpenSans(
-                                text: "Add Expense",
-                                size: 17.0,
-                                color: Colors.white,
-                              )
-                            ],
-                          ),
-                          splashColor: Colors.grey,
-                          color: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          onPressed: () async {
-                            await viewModelProvider.addExpense(context);
-                          },
-                        ),
-                  ),
+                      AddingButtons(provider: viewModelProvider, name: "Add Expense", isweb: true),
                       SizedBox(
                         height: 50,
                         width: 160,
                       ),
-                      SizedBox(
-                        height: 45.0,
-                        width: 160.0,
-                        child: MaterialButton(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 17.0,
-                              ),
-                              OpenSans(
-                                text: "Add Income",
-                                size: 17.0,
-                                color: Colors.white,
-                              )
-                            ],
-                          ),
-                          splashColor: Colors.grey,
-                          color: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          onPressed: () async {
-                            await viewModelProvider.addIncome(context);
-                          },
-                        ),
-                      )                    ]
+AddingButtons(provider: viewModelProvider, name: "Add Income", isweb: true)                    ]
                   )),
                   SizedBox(
                     width: 30.0,
