@@ -22,7 +22,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
     }
     int totalExpense = 0;
     int totalIncome = 0;
-    List<int> values= calculate(viewModelProvider,totalExpense,totalIncome);
+    List<int> values= viewModelProvider.calculate(totalExpense,totalIncome);
     totalExpense=values[0];
     totalIncome=values[1];
     int budgetLeft = totalIncome - totalExpense;
@@ -34,6 +34,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
           IconButton(
               onPressed: () async {
                 viewModelProvider.reset();
+                budgetLeft=0;
               },
               icon: Icon(Icons.refresh))
         ],
@@ -58,69 +59,7 @@ class ExpenseViewMobile extends HookConsumerWidget {
           SizedBox(height: 40.0),
           Column(
             children: [
-              Container(
-                height: 240.0,
-                width: widthDevice / 1.5,
-                padding: EdgeInsets.all(15.0),
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple,
-                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Poppins(
-                          text: "Budget Left",
-                          size: 14.0,
-                          color: Colors.white,
-                        ),
-                        Poppins(
-                          text: "Total Expense",
-                          size: 14.0,
-                          color: Colors.white,
-                        ),
-                        Poppins(
-                          text: "Total Income",
-                          size: 14.0,
-                          color: Colors.white,
-                        )
-                      ],
-                    ),
-                    RotatedBox(
-                        quarterTurns: 1,
-                        child: Divider(
-                          indent: 40.0,
-                          endIndent: 40.0,
-                          color: Colors.grey,
-                        )),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Poppins(
-                          text: budgetLeft.toString(),
-                          size: 14.0,
-                          color: Colors.white,
-                        ),
-                        Poppins(
-                          text: totalExpense.toString(),
-                          size: 14.0,
-                          color: Colors.white,
-                        ),
-                        Poppins(
-                          text: totalIncome.toString(),
-                          size: 14.0,
-                          color: Colors.white,
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+              CompareBox(widthDevice: widthDevice, totalExpense: totalExpense,totalIncome: totalIncome,budgetLeft: budgetLeft,),
             ],
           ),
           SizedBox(
@@ -130,11 +69,11 @@ class ExpenseViewMobile extends HookConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               //add expense
-              AddingButtons(provider: viewModelProvider, name: "Add Expense", isweb: false),
+              AddingButtons(provider: viewModelProvider, name: "Add Expense", isweb: false,isincome: false,),
               SizedBox(
                 width: 10.0,
               ),
-          AddingButtons(provider: viewModelProvider, name: "Add Income", isweb: false),
+          AddingButtons(provider: viewModelProvider, name: "Add Income", isweb: false,isincome: true,),
 
 
             ],
@@ -160,22 +99,22 @@ class ExpenseViewMobile extends HookConsumerWidget {
                         borderRadius: BorderRadius.all(
                           Radius.circular(15.0),
                         ),
-                        border: Border.all(width: 1.0, color: Colors.black),
+                        border: Border.all(width: 1.0, color: Colors.red),
                       ),
                       child: ListView.builder(
-                          itemCount: viewModelProvider.expensesAmount.length,
+                          itemCount: viewModelProvider.expenses.length,
                           itemBuilder: (BuildContext context, int index) {
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Poppins(
-                                    text: viewModelProvider.expensesName[index],
+                                    text: viewModelProvider.expenses[index].name,
                                     size: 14.0),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: Poppins(
                                       text: viewModelProvider
-                                          .expensesAmount[index],
+                                          .expenses[index].amount,
                                       size: 14.0),
                                 )
                               ],
@@ -193,21 +132,21 @@ class ExpenseViewMobile extends HookConsumerWidget {
                       width: 180.0,
                       decoration: BoxDecoration(
                         color: Colors.lightGreen,
-                        border: Border.all(width: 1.0, color: Colors.black),
+                        border: Border.all(width: 1.0, color: Colors.green),
                         borderRadius: BorderRadius.all(Radius.circular(15.0))
                       ),
-                      child: ListView.builder(itemCount:viewModelProvider.incomesAmount.length,itemBuilder: (BuildContext context, int index){
+                      child: ListView.builder(itemCount:viewModelProvider.incomes.length,itemBuilder: (BuildContext context, int index){
                         return  Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Poppins(
-                                text: viewModelProvider.incomesName[index],
+                                text: viewModelProvider.incomes[index].name,
                                 size: 14.0),
                             Align(
                               alignment: Alignment.centerRight,
                               child: Poppins(
                                   text: viewModelProvider
-                                      .incomesAmount[index],
+                                      .incomes[index].amount,
                                   size: 14.0),
                             )
                           ],

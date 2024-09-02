@@ -334,7 +334,8 @@ class AddingButtons extends StatefulWidget {
   final provider;
   final String name;
   final bool isweb;
-  const AddingButtons({super.key, @required this.provider,required this.name, required this.isweb});
+  final isincome;
+  const AddingButtons({super.key, @required this.provider,required this.name, required this.isweb, this.isincome});
 
   @override
   State<AddingButtons> createState() => _AddingButtonsState();
@@ -368,9 +369,88 @@ class _AddingButtonsState extends State<AddingButtons> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       onPressed: () async {
-        await widget.provider.addExpense(context);
+        widget.isincome? await widget.provider.addIncome(context):await widget.provider.addExpense(context);
       },
     ));
+  }
+}
+class CompareBox extends StatefulWidget {
+  final budgetLeft;
+  final totalExpense;
+  final totalIncome;
+  final widthDevice;
+  const CompareBox({super.key, @required this.budgetLeft, @required this.totalExpense, this.totalIncome, @required this.widthDevice});
+
+  @override
+  State<CompareBox> createState() => _CompareBoxState();
+}
+
+class _CompareBoxState extends State<CompareBox> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: kIsWeb?300:240.0,
+      width: kIsWeb?280:widget.widthDevice / 1.5,
+      padding: EdgeInsets.all(15.0),
+      decoration: BoxDecoration(
+        color: Colors.deepPurple,
+        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Poppins(
+                text: "Budget Left",
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              ),
+              Poppins(
+                text: "Total Expense",
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              ),
+              Poppins(
+                text: "Total Income",
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              )
+            ],
+          ),
+          RotatedBox(
+              quarterTurns: 1,
+              child: Divider(
+                indent: 40.0,
+                endIndent: 40.0,
+                color: Colors.grey,
+              )),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Poppins(
+                text: widget.budgetLeft.toString(),
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              ),
+              Poppins(
+                text: widget.totalExpense.toString(),
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              ),
+              Poppins(
+                text: widget.totalIncome.toString(),
+                size: kIsWeb?17.0:14.0,
+                color: Colors.white,
+              )
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
